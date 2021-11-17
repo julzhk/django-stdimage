@@ -1,12 +1,16 @@
 import io
 import os
 import time
+from copy import deepcopy
 
 import pytest
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db.models.fields.files import ImageFieldFile
 from PIL import Image
+
+from stdimage.models import StdImageFieldFile
 
 from . import models
 from .models import (
@@ -169,6 +173,47 @@ class TestModel(TestStdImage):
         with django_assert_num_queries(1):
             deferred.image
         assert instance.image.thumbnail == deferred.image.thumbnail
+
+    @pytest.mark.django_db
+    def test_variations_deepcopy(self):
+        """Tests test_variations() with a deep copied object"""
+        instance_original = ResizeModel.objects.create(
+            image=self.fixtures["600x400.jpg"]
+        )
+        instance = deepcopy(instance_original)
+        assert isinstance(instance.image, StdImageFieldFile)
+
+        assert hasattr(instance.image, "thumbnail")
+        assert hasattr(instance.image, "medium")
+
+        assert isinstance(instance.image.thumbnail, ImageFieldFile)
+        assert isinstance(instance.image.medium, ImageFieldFile)
+
+        source_file = self.fixtures["600x400.jpg"]
+
+        assert os.path.exists(os.path.join(IMG_DIR, "600x400.jpg"))
+        assert instance.image.width == 600
+        assert instance.image.height == 400
+        path = os.path.join(IMG_DIR, "600x400.jpg")
+
+        with open(path, "rb") as f:
+            source_file.seek(0)
+            assert source_file.read() == f.read()
+
+        path = os.path.join(IMG_DIR, "600x400.medium.jpg")
+        assert os.path.exists(path)
+        assert instance.image.medium.width == 400
+        assert instance.image.medium.height <= 400
+        with open(os.path.join(IMG_DIR, "600x400.medium.jpg"), "rb") as f:
+            source_file.seek(0)
+            assert source_file.read() != f.read()
+
+        assert os.path.exists(os.path.join(IMG_DIR, "600x400.thumbnail.jpg"))
+        assert instance.image.thumbnail.width == 100
+        assert instance.image.thumbnail.height <= 75
+        with open(os.path.join(IMG_DIR, "600x400.thumbnail.jpg"), "rb") as f:
+            source_file.seek(0)
+            assert source_file.read() != f.read()
 
 
 class TestUtils(TestStdImage):

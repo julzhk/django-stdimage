@@ -144,6 +144,25 @@ class StdImageFieldFile(ImageFieldFile):
             variation_name = self.get_variation_name(self.name, variation)
             self.storage.delete(variation_name)
 
+    def __getstate__(self):
+        state = super().__getstate__()
+        state["variations"] = {}
+        for variation_name in self.field.variations:
+            variation = getattr(self, variation_name)
+            variation_state = variation.__getstate__()
+            state["variations"][variation_name] = variation_state
+        return state
+
+    def __setstate__(self, state):
+        variations = state["variations"]
+        state.pop("variations")
+        super().__setstate__(state)
+        for key, value in variations.items():
+            cls = ImageFieldFile
+            field = cls.__new__(cls)
+            setattr(self, key, field)
+            getattr(self, key).__setstate__(value)
+
 
 class StdImageField(ImageField):
     """
