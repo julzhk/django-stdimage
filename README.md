@@ -191,5 +191,5 @@ python manage.py rendervariations 'app_name.model_name.field_name' [--replace] [
 ```
 The `replace` option will replace all existing files.
 The `ignore-missing` option will suspend missing source file errors and keep
-rendering variations for other files. Othervise command will stop on first
+rendering variations for other files. Otherwise command will stop on first
 missing file.
