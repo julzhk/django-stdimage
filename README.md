@@ -44,7 +44,7 @@ Now it's instally you can use either: `StdImageField` or `JPEGField`.
 [ImageField](https://docs.djangoproject.com/en/dev/ref/models/fields/#imagefield)
 except that you can specify different size variations.
 
-The `JPEGField` is the same as the `StdImageField` but all images are
+The `JPEGField` is identical to the `StdImageField` but all images are
 converted to JPEGs, no matter what type the original file is.
 
 ### Variations
