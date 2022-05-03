@@ -26,7 +26,7 @@ Django Standardized Image Field implements the following features:
 
 ## Installation
 
-Simply install the latest stable package using the following command
+Simply install the latest stable package using the following command:
 
 ```bash
 pip install django-stdimage
