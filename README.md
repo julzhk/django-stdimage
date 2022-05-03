@@ -22,7 +22,7 @@ Django Standardized Image Field implements the following features:
 * Preserves original images
 * Can be rendered asynchronously (ie as a [Celery job](https://realpython.com/asynchronous-tasks-with-django-and-celery/))
 * Restricts acceptable image dimensions
-* Renames file to a standardized name format (using a callable `upload_to` function, see below)
+* Renames a file to a standardized name format (using a callable `upload_to` function, see below)
 
 ## Installation
 
